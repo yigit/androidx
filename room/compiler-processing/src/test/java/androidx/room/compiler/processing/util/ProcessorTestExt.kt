@@ -130,7 +130,6 @@ fun runProcessorTest(
         Truth.assertThat(compilationResult.exitCode).isEqualTo(KotlinCompilation.ExitCode.OK)
         kspProcessor.throwIfFailed()
     }
-
 }
 
 fun runProcessorTestForFailedCompilation(
