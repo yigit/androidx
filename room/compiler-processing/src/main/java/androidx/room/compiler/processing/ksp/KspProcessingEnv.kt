@@ -25,7 +25,6 @@ import androidx.room.compiler.processing.XTypeElement
 import org.jetbrains.kotlin.ksp.processing.CodeGenerator
 import org.jetbrains.kotlin.ksp.processing.KSPLogger
 import org.jetbrains.kotlin.ksp.processing.Resolver
-import org.jetbrains.kotlin.ksp.symbol.KSClassDeclaration
 import javax.annotation.processing.Filer
 
 internal class KspProcessingEnv(

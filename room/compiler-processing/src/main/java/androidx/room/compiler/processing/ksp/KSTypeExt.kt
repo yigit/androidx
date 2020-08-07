@@ -43,7 +43,7 @@ internal fun KSTypeReference?.typeName(): TypeName {
     return resolved?.typeName(this) ?: fallbackClassName()
 }
 
-private fun KSTypeReference.fallbackClassName() : ClassName {
+private fun KSTypeReference.fallbackClassName(): ClassName {
     return (element as? KSClassifierReference)?.let {
         ClassName.get("", it.referencedName())
     } ?: UNDEFINED
@@ -61,7 +61,7 @@ private fun KSDeclaration.typeName(reference: KSTypeReference): ClassName {
     return qualifiedName?.typeName(reference) ?: simpleName.typeName(reference)
 }
 
-private fun KSType.typeName(reference: KSTypeReference) : TypeName {
+private fun KSType.typeName(reference: KSTypeReference): TypeName {
     return if (this.arguments.isNotEmpty()) {
         val args: Array<TypeName> = this.arguments.map {
             it.type.typeName()
