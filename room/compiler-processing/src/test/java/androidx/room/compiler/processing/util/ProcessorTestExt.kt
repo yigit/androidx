@@ -26,6 +26,7 @@ import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.symbolProcessors
 
 // utility to run ksp tests only for easy local debugging
+// TODO remove this before merging back to AndroidX
 val runKspTestsOnly = System.getenv("RUN_KSP_TESTS_ONLY")?.toIntOrNull() == 1
 
 private fun compileSources(

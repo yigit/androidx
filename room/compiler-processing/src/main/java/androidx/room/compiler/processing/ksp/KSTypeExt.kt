@@ -36,16 +36,16 @@ private val UNDEFINED = ClassName.get("androidx.room.compiler.processing.kotlin.
  * element.
  */
 internal fun KSTypeReference?.typeName(): TypeName {
-    if (this == null) {
-        return UNDEFINED
+    return if (this == null) {
+        UNDEFINED
+    } else {
+        resolve()?.typeName() ?: fallbackClassName()
     }
-    val resolved = resolve()
-    return resolved?.typeName() ?: fallbackClassName()
 }
 
 private fun KSTypeReference.fallbackClassName(): ClassName {
     return (element as? KSClassifierReference)?.let {
-        ClassName.get("", it.referencedName())
+        ClassName.bestGuess(it.referencedName())
     } ?: UNDEFINED
 }
 
@@ -73,6 +73,6 @@ private fun KSType.typeName(): TypeName? {
             *args
         )
     } else {
-        return this.declaration.typeName()
+        this.declaration.typeName()
     }
 }
