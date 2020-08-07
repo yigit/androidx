@@ -23,8 +23,12 @@ import androidx.room.compiler.processing.XProcessingEnv
 import androidx.room.compiler.processing.XType
 import androidx.room.compiler.processing.XTypeElement
 import org.jetbrains.kotlin.ksp.processing.CodeGenerator
+import org.jetbrains.kotlin.ksp.processing.KSBuiltIns
 import org.jetbrains.kotlin.ksp.processing.KSPLogger
 import org.jetbrains.kotlin.ksp.processing.Resolver
+import org.jetbrains.kotlin.ksp.symbol.KSClassDeclaration
+import org.jetbrains.kotlin.ksp.symbol.KSType
+import org.jetbrains.kotlin.ksp.symbol.KSTypeReference
 import javax.annotation.processing.Filer
 
 internal class KspProcessingEnv(
@@ -33,17 +37,28 @@ internal class KspProcessingEnv(
     private val logger: KSPLogger,
     val resolver: Resolver
 ) : XProcessingEnv {
+    val builtIns by lazy {
+        KSBuiltIns::class.java.declaredMethods.filter {
+            KSType::class.java.isAssignableFrom(it.returnType)
+        }.associate {
+            val ksType = it.invoke(resolver.builtIns) as KSType
+            checkNotNull(ksType.typeName().toString()) to ksType
+        }
+    }
     override val messager: XMessager
         get() = TODO("Not yet implemented")
     override val filer: Filer
         get() = TODO("Not yet implemented")
 
-    override fun findTypeElement(qName: String): XTypeElement? {
-        TODO("Not yet implemented")
+    override fun findTypeElement(qName: String): KspTypeElement? {
+        return resolver.findClass(qName)?.let(this::wrapClassDeclaration)
     }
 
     override fun findType(qName: String): XType? {
-        TODO("Not yet implemented")
+        builtIns[qName]?.let {
+            return KspType(env = this, resolved = it)
+        }
+        return findTypeElement(qName)?.type
     }
 
     override fun findGeneratedAnnotation(): XTypeElement? {
@@ -56,5 +71,21 @@ internal class KspProcessingEnv(
 
     override fun getArrayType(type: XType): XArrayType {
         TODO("Not yet implemented")
+    }
+
+    fun wrapClassDeclaration(declaration: KSClassDeclaration): KspTypeElement {
+        return KspTypeElement(this, declaration)
+    }
+
+    fun wrap(ksType: KSType): KspType {
+        return KspType(
+            env = this,
+            resolved = ksType)
+    }
+
+    fun wrap(ksTypeReference: KSTypeReference): KspType {
+        return KspType(
+            env = this,
+            ksTypeReference = ksTypeReference)
     }
 }
