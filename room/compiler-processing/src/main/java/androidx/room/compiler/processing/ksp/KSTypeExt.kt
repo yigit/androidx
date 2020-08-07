@@ -54,7 +54,10 @@ private fun KSName.typeName(): ClassName? {
         // fallback to reference
         return null
     }
-    return ClassName.get(getQualifier(), getShortName())
+    // TODO KSP currently do not model package names separate from the simple names.
+    //  see: https://github.com/android/kotlin/issues/23
+    val shortNames = getShortName().split(".")
+    return ClassName.get(getQualifier(), shortNames.first(), *(shortNames.drop(1).toTypedArray()))
 }
 
 private fun KSDeclaration.typeName(): ClassName? {

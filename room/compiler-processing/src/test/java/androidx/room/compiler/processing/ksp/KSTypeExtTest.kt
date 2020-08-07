@@ -65,7 +65,11 @@ class KSTypeExtTest {
                         ANY_TYPE_NAME
                     )
                 )
-            assertThat(subject.propertyType("nested").typeName())
+            val typeName = subject.propertyType("nested").typeName()
+            // TODO this works even though the package name of the value read from KSP is not
+            //  correct. see: https://github.com/android/kotlin/issues/23
+            //  After that issue is fixed, we should enhance this test to validate package name.
+            assertThat(typeName)
                 .isEqualTo(
                     ClassName.get("foo.bar", "Baz", "Nested")
                 )
