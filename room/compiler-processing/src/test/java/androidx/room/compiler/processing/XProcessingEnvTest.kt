@@ -133,6 +133,7 @@ class XProcessingEnvTest {
         ) { invocation ->
             PRIMITIVE_TYPES.forEach {
                 val targetType = invocation.processingEnv.findType(it.key)
+                assertThat(targetType?.isPrimitive()).isTrue()
                 assertThat(targetType?.typeName).isEqualTo(it.value)
                 assertThat(targetType?.boxed()?.typeName).isEqualTo(it.value.box())
             }

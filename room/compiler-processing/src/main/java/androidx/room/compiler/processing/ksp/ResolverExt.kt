@@ -17,10 +17,23 @@
 package androidx.room.compiler.processing.ksp
 
 import org.jetbrains.kotlin.ksp.processing.Resolver
+import org.jetbrains.kotlin.ksp.symbol.KSClassDeclaration
+import java.util.Locale
 
-internal fun Resolver.findClass(qName: String) = getClassDeclarationByName(
-    getKSNameFromString(qName)
-)
+internal fun Resolver.findClass(qName: String): KSClassDeclaration? {
+    getClassDeclarationByName(
+        getKSNameFromString(qName)
+    )?.let {
+        return it
+    }
+    // check to see if it matches one of the builtins
+    if(!qName.contains('.')) {
+        return getClassDeclarationByName(
+            getKSNameFromString("kotlin.${qName.capitalize(Locale.US)}")
+        )
+    }
+    return null
+}
 
 internal fun Resolver.requireClass(qName: String) = checkNotNull(findClass(qName)) {
     "cannot find class $qName"
