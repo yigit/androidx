@@ -25,28 +25,28 @@ import org.jetbrains.kotlin.ksp.symbol.KSName
 import org.jetbrains.kotlin.ksp.symbol.KSType
 import org.jetbrains.kotlin.ksp.symbol.KSTypeReference
 
+// catch-all type name when we cannot resolve to anything.
 private val UNDEFINED = ClassName.get("androidx.room.compiler.processing.kotlin.error", "Undefined")
+
+/**
+ * Turns a KSTypeReference into a TypeName
+ *
+ * We try to achieve this by first resolving it and iterating.
+ * If some types cannot be resolved, we do a best effort name guess from the KSTypeReference's
+ * element.
+ */
 internal fun KSTypeReference?.typeName(): TypeName {
     if (this == null) {
         return UNDEFINED
     }
     val resolved = resolve()
-    if (resolved == null) {
-        // error, try to get some value out of it
-        (element as? KSClassifierReference)?.let {
-
-        }
-        return UNDEFINED
-    } else {
-        return resolved.typeName(this)
-    }
+    return resolved?.typeName(this) ?: fallbackClassName()
 }
 
 private fun KSTypeReference.fallbackClassName() : ClassName {
     return (element as? KSClassifierReference)?.let {
         ClassName.get("", it.referencedName())
     } ?: UNDEFINED
-
 }
 
 private fun KSName.typeName(reference: KSTypeReference): ClassName {
