@@ -40,7 +40,7 @@ internal fun KSTypeReference?.typeName(): TypeName {
         return UNDEFINED
     }
     val resolved = resolve()
-    return resolved?.typeName(this) ?: fallbackClassName()
+    return resolved?.typeName() ?: fallbackClassName()
 }
 
 private fun KSTypeReference.fallbackClassName(): ClassName {
@@ -49,29 +49,30 @@ private fun KSTypeReference.fallbackClassName(): ClassName {
     } ?: UNDEFINED
 }
 
-private fun KSName.typeName(reference: KSTypeReference): ClassName {
+private fun KSName.typeName(): ClassName? {
     if (asString().isBlank()) {
         // fallback to reference
-        return reference.fallbackClassName()
+        return null
     }
     return ClassName.get(getQualifier(), getShortName())
 }
 
-private fun KSDeclaration.typeName(reference: KSTypeReference): ClassName {
-    return qualifiedName?.typeName(reference) ?: simpleName.typeName(reference)
+private fun KSDeclaration.typeName(): ClassName? {
+    // we are only interested in qualified name as if it does not exist, it is an error for Room
+    return qualifiedName?.typeName()
 }
 
-private fun KSType.typeName(reference: KSTypeReference): TypeName {
+private fun KSType.typeName(): TypeName? {
     return if (this.arguments.isNotEmpty()) {
         val args: Array<TypeName> = this.arguments.map {
             it.type.typeName()
         }.toTypedArray()
-        val className = declaration.typeName(reference)
+        val className = declaration.typeName() ?: return null
         ParameterizedTypeName.get(
             className,
             *args
         )
     } else {
-        return this.declaration.typeName(reference)
+        return this.declaration.typeName()
     }
 }
