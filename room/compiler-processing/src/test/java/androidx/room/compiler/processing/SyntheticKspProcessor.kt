@@ -24,7 +24,7 @@ import org.jetbrains.kotlin.ksp.processing.Resolver
 import org.jetbrains.kotlin.ksp.processing.SymbolProcessor
 
 class SyntheticKspProcessor(
-    val handler: (TestInvocation) -> Unit
+    private val handler: (TestInvocation) -> Unit
 ) : SymbolProcessor {
     private var result: Result<Unit>? = null
     private lateinit var options: Map<String, String>

@@ -19,6 +19,7 @@ package androidx.room.compiler.processing.util
 import androidx.room.compiler.processing.SyntheticJavacProcessor
 import androidx.room.compiler.processing.SyntheticKspProcessor
 import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import com.google.testing.compile.CompileTester
 import com.google.testing.compile.JavaSourcesSubjectFactory
 import com.tschuchort.compiletesting.KotlinCompilation
@@ -67,9 +68,7 @@ private fun compileWithKsp(
     handler: (TestInvocation) -> Unit
 ): Pair<SyntheticKspProcessor, KotlinCompilation> {
     @Suppress("NAME_SHADOWING")
-    val sources = if (sources.none {
-            it is Source.KotlinSource
-        }) {
+    val sources = if (sources.none { it is Source.KotlinSource }) {
         // looks like this requires a kotlin source file
         // see: https://github.com/tschuchortdev/kotlin-compile-testing/issues/57
         sources + Source.kotlin("placeholder.kt", "")
@@ -119,7 +118,7 @@ fun runProcessorTest(
     run {
         val (kaptProcessor, kotlinCompilation) = compileWithKapt(sources, handler)
         val compilationResult = kotlinCompilation.compile()
-        Truth.assertThat(compilationResult.exitCode).isEqualTo(KotlinCompilation.ExitCode.OK)
+        assertThat(compilationResult.exitCode).isEqualTo(KotlinCompilation.ExitCode.OK)
         kaptProcessor.throwIfFailed()
     }
 
@@ -127,7 +126,7 @@ fun runProcessorTest(
     run {
         val (kspProcessor, kotlinCompilation) = compileWithKsp(sources, handler)
         val compilationResult = kotlinCompilation.compile()
-        Truth.assertThat(compilationResult.exitCode).isEqualTo(KotlinCompilation.ExitCode.OK)
+        assertThat(compilationResult.exitCode).isEqualTo(KotlinCompilation.ExitCode.OK)
         kspProcessor.throwIfFailed()
     }
 }
@@ -143,6 +142,6 @@ fun runProcessorTestForFailedCompilation(
     // now run with kapt
     val (kaptProcessor, kotlinCompilation) = compileWithKapt(sources, handler)
     val compilationResult = kotlinCompilation.compile()
-    Truth.assertThat(compilationResult.exitCode).isNotEqualTo(KotlinCompilation.ExitCode.OK)
+    assertThat(compilationResult.exitCode).isNotEqualTo(KotlinCompilation.ExitCode.OK)
     kaptProcessor.throwIfFailed()
 }
