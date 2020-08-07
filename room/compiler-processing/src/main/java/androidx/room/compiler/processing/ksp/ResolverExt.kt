@@ -18,10 +18,10 @@ package androidx.room.compiler.processing.ksp
 
 import org.jetbrains.kotlin.ksp.processing.Resolver
 
-internal fun Resolver.findClass(qName:String) = getClassDeclarationByName(
+internal fun Resolver.findClass(qName: String) = getClassDeclarationByName(
     getKSNameFromString(qName)
 )
 
-internal fun Resolver.requireClass(qName:String) = checkNotNull(findClass(qName)) {
+internal fun Resolver.requireClass(qName: String) = checkNotNull(findClass(qName)) {
     "cannot find class $qName"
 }

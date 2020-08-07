@@ -103,10 +103,12 @@ fun runProcessorTest(
     @Suppress("NAME_SHADOWING")
     val sources = if (sources.isEmpty()) {
         // synthesize a source to trigger compilation
-        listOf(Source.java("foo.bar.SyntheticSource", """
+        listOf(
+            Source.java("foo.bar.SyntheticSource", """
             package foo.bar;
             public class SyntheticSource {}
-        """.trimIndent()))
+        """.trimIndent())
+        )
     } else {
         sources
     }
@@ -130,7 +132,7 @@ fun runProcessorTest(
 
 fun runKspTest(
     sources: List<Source>,
-    succeed : Boolean,
+    succeed: Boolean,
     handler: (TestInvocation) -> Unit
 ) {
     val (kspProcessor, kotlinCompilation) = compileWithKsp(sources, handler)
