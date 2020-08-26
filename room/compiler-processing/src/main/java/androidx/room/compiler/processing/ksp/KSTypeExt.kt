@@ -26,7 +26,7 @@ import org.jetbrains.kotlin.ksp.symbol.KSType
 import org.jetbrains.kotlin.ksp.symbol.KSTypeReference
 
 // catch-all type name when we cannot resolve to anything.
-private val UNDEFINED = ClassName.get("androidx.room.compiler.processing.kotlin.error", "Undefined")
+internal val UNDEFINED = ClassName.get("androidx.room.compiler.processing.kotlin.error", "Undefined")
 
 /**
  * Turns a KSTypeReference into a TypeName
@@ -77,7 +77,7 @@ private fun KSDeclaration.typeName(): ClassName? {
     return ClassName.get(pkg, shortNames.first(), *(shortNames.drop(1).toTypedArray()))
 }
 
-private fun KSType.typeName(): TypeName? {
+internal fun KSType.typeName(): TypeName? {
     return if (this.arguments.isNotEmpty()) {
         val args: Array<TypeName> = this.arguments.map {
             it.type.typeName()
