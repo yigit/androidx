@@ -16,21 +16,14 @@
 
 package androidx.room.compiler.processing.ksp
 
-import androidx.room.compiler.processing.XNullability
 import androidx.room.compiler.processing.XNullability.NONNULL
 import androidx.room.compiler.processing.XNullability.NULLABLE
-import androidx.room.compiler.processing.XType
 import androidx.room.compiler.processing.util.Source
 import androidx.room.compiler.processing.util.TestInvocation
 import androidx.room.compiler.processing.util.runKspTest
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import com.squareup.javapoet.ClassName
-import com.squareup.javapoet.TypeName
 import org.jetbrains.kotlin.ksp.getDeclaredFunctions
-import org.jetbrains.kotlin.ksp.getDeclaredProperties
-import org.jetbrains.kotlin.ksp.symbol.KSDeclaration
-import org.jetbrains.kotlin.ksp.symbol.KSFunctionDeclaration
 import org.jetbrains.kotlin.ksp.symbol.KSPropertyDeclaration
 import org.jetbrains.kotlin.ksp.symbol.KSTypeReference
 import org.junit.Test
@@ -407,8 +400,8 @@ class KspTypeTest {
         ) { invocation ->
             val env = (invocation.processingEnv as KspProcessingEnv)
             val classNames = listOf("Bar", "Bar_NullableFoo")
-            val typeArgs = classNames.associate {
-                it to env.resolver.findClass(it)!!
+            val typeArgs = classNames.associateWith {
+                env.resolver.findClass(it)!!
                     .asStarProjectedType()
                     .arguments
                     .single()
@@ -470,15 +463,6 @@ class KspTypeTest {
             }
         }
         throw IllegalStateException("cannot find any property with name $name")
-    }
-
-    private fun TestInvocation.requireMethod(name: String): KSFunctionDeclaration {
-        (processingEnv as KspProcessingEnv).resolver.getAllFiles().forEach { file ->
-            return file.declarations.first {
-                it.simpleName.asString() == name
-            } as KSFunctionDeclaration
-        }
-        throw IllegalStateException("cannot find any method with name $name")
     }
 
     private fun TestInvocation.wrap(typeRef: KSTypeReference): KspType {
