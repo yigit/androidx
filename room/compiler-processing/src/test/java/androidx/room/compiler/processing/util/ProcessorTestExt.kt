@@ -128,7 +128,7 @@ fun runProcessorTest(
     }
 
     // now run with ksp
-    //runKspTest(sources, succeed = true, handler = handler)
+    runKspTest(sources, succeed = true, handler = handler)
 }
 
 fun runKspTest(

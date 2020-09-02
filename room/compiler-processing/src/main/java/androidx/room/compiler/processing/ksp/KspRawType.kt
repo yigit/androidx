@@ -32,8 +32,7 @@ internal class KspRawType private constructor(
     override fun isAssignableFrom(other: XRawType): Boolean {
         check(other is KspRawType)
         return when {
-            other.ksType == null -> this == other
-            ksType == null -> false
+            other.ksType == null || ksType == null -> this == other
             else -> ksType.isAssignableFrom(other.ksType)
         }
     }

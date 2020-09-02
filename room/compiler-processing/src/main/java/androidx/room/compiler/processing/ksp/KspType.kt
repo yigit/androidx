@@ -30,6 +30,14 @@ import org.jetbrains.kotlin.ksp.symbol.KSTypeReference
 import org.jetbrains.kotlin.ksp.symbol.Nullability
 import kotlin.reflect.KClass
 
+/**
+ * XType implementation for KSP type.
+ *
+ * It might be initialized with a [KSTypeReference] or [KSType] depending on the call point.
+ *
+ * We don't necessarily have a [KSTypeReference] (e.g. if we are getting it from an element).
+ * Similarly, we may not be able to get a [KSType] (e.g. if it resolves to error).
+ */
 internal class KspType private constructor(
     private val env: KspProcessingEnv,
     private val ksTypeReference: KSTypeReference?,
@@ -40,11 +48,13 @@ internal class KspType private constructor(
         ksTypeReference = ksTypeReference,
         resolved = null
     )
+
     constructor(env: KspProcessingEnv, resolved: KSType) : this(
         env = env,
         ksTypeReference = null,
         resolved = resolved
     )
+
     internal val ksType by lazy {
         resolved ?: ksTypeReference?.resolve()
     }
@@ -52,7 +62,10 @@ internal class KspType private constructor(
         KspRawType(this)
     }
     override val typeArguments: List<XType> by lazy {
-        val args = ksTypeReference?.element?.typeArguments ?: resolved?.arguments ?: emptyList()
+        // prioritize type reference if it exists as it will have actaul types user picked.
+        val args = ksTypeReference?.element?.typeArguments
+            ?: resolved?.arguments
+            ?: emptyList()
         args.map {
             // TODO what if it.type is null?
             env.wrap(it.type!!)
@@ -62,7 +75,7 @@ internal class KspType private constructor(
         ksType?.typeName() ?: ksTypeReference?.typeName() ?: UNDEFINED
     }
     override val nullability by lazy {
-        when(ksType?.nullability) {
+        when (ksType?.nullability) {
             Nullability.NULLABLE -> XNullability.NULLABLE
             Nullability.NOT_NULL -> XNullability.NONNULL
             else -> XNullability.UNKNOWN
@@ -84,11 +97,13 @@ internal class KspType private constructor(
 
     override fun defaultValue(): String {
         val type = ksType ?: return "null"
+        // NOTE: this does not match the java implementation though it is probably more correct for
+        // kotlin.
         if (type.nullability == Nullability.NULLABLE) {
             return "null"
         }
         val builtIns = env.resolver.builtIns
-        return when(type) {
+        return when (type) {
             builtIns.booleanType -> "false"
             builtIns.byteType, builtIns.shortType, builtIns.intType, builtIns.longType, builtIns
                 .charType -> "0"

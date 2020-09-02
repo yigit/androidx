@@ -419,7 +419,6 @@ class KspTypeTest {
         }
     }
 
-
     @Test
     fun wildcardJava() {
         val src = Source.java(
