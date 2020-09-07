@@ -18,13 +18,16 @@ package androidx.room.compiler.processing.ksp
 
 import androidx.room.compiler.processing.XArrayType
 import androidx.room.compiler.processing.XDeclaredType
+import androidx.room.compiler.processing.XElement
 import androidx.room.compiler.processing.XMessager
 import androidx.room.compiler.processing.XProcessingEnv
 import androidx.room.compiler.processing.XType
 import androidx.room.compiler.processing.XTypeElement
+import androidx.room.compiler.processing.javac.XTypeElementStore
 import org.jetbrains.kotlin.ksp.processing.CodeGenerator
 import org.jetbrains.kotlin.ksp.processing.KSPLogger
 import org.jetbrains.kotlin.ksp.processing.Resolver
+import org.jetbrains.kotlin.ksp.symbol.KSClassDeclaration
 import org.jetbrains.kotlin.ksp.symbol.KSType
 import org.jetbrains.kotlin.ksp.symbol.KSTypeReference
 import javax.annotation.processing.Filer
@@ -35,13 +38,25 @@ internal class KspProcessingEnv(
     private val logger: KSPLogger,
     val resolver: Resolver
 ) : XProcessingEnv {
+    private val typeElementStore =
+        XTypeElementStore { qName ->
+            resolver.getClassDeclarationByName(
+                resolver.getKSNameFromString(qName)
+            )?.let {
+                KspTypeElement(
+                    env = this,
+                    declaration = it
+                )
+            }
+        }
+
     override val messager: XMessager
         get() = TODO("Not yet implemented")
     override val filer: Filer
         get() = TODO("Not yet implemented")
 
     override fun findTypeElement(qName: String): XTypeElement? {
-        TODO("Not yet implemented")
+        return typeElementStore[qName]
     }
 
     override fun findType(qName: String): XType? {
@@ -72,5 +87,12 @@ internal class KspProcessingEnv(
         return KspType(
             env = this,
             ksTypeReference = ksTypeReference)
+    }
+
+    fun wrapClassDeclaration(declaration: KSClassDeclaration): XElement {
+        return KspTypeElement(
+            env = this,
+            declaration = declaration
+        )
     }
 }
