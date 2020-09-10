@@ -62,7 +62,7 @@ internal class KspType private constructor(
         KspRawType(this)
     }
     override val typeArguments: List<XType> by lazy {
-        // prioritize type reference if it exists as it will have actaul types user picked.
+        // prioritize type reference if it exists as it will have actual types user picked.
         val args = ksTypeReference?.element?.typeArguments
             ?: resolved?.arguments
             ?: emptyList()
@@ -118,15 +118,15 @@ internal class KspType private constructor(
     }
 
     override fun isInt(): Boolean {
-        return ksType.isAssignableFromWithErrorWorkaround(env.resolver.builtIns.intType)
+        return env.commonTypes.nullableInt.isAssignableFromWithErrorWorkaround(ksType)
     }
 
     override fun isLong(): Boolean {
-        return ksType.isAssignableFromWithErrorWorkaround(env.resolver.builtIns.longType)
+        return env.commonTypes.nullableLong.isAssignableFromWithErrorWorkaround(ksType)
     }
 
     override fun isByte(): Boolean {
-        return ksType.isAssignableFromWithErrorWorkaround(env.resolver.builtIns.byteType)
+        return env.commonTypes.nullableByte.isAssignableFromWithErrorWorkaround(ksType)
     }
 
     override fun isNone(): Boolean {

@@ -40,6 +40,8 @@ internal class KspProcessingEnv(
     override val filer: Filer
         get() = TODO("Not yet implemented")
 
+    val commonTypes = CommonTypes(resolver)
+
     override fun findTypeElement(qName: String): XTypeElement? {
         TODO("Not yet implemented")
     }
@@ -72,5 +74,17 @@ internal class KspProcessingEnv(
         return KspType(
             env = this,
             ksTypeReference = ksTypeReference)
+    }
+
+    class CommonTypes(resolver: Resolver) {
+        val nullableInt by lazy {
+            resolver.builtIns.intType.makeNullable()
+        }
+        val nullableLong by lazy {
+            resolver.builtIns.longType.makeNullable()
+        }
+        val nullableByte by lazy {
+            resolver.builtIns.byteType.makeNullable()
+        }
     }
 }
